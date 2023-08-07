@@ -916,7 +916,7 @@ Na funcionalidade de listagem de transações do usuário logado (**GET /transac
 
 ## **Aulas úteis:**
 
--   [CRUD SQL](https://plataforma.cubos.academy/curso/90bb4fdd-85c7-4f90-9753-38c264a80382/data/16/11/2021/aula/0cdd1159-77c4-426b-811c-aead4ec30a8d/81ee786d-751c-4a9b-9eb2-43954356117e)
+-   [CRUD SQL](https://aulas.cubos.academy/turma/6180ea7c-53ac-4270-bd46-d772873added/aulas/4ee4bbf0-4299-441d-ae7a-295951876c9e)
 -   [Modelagem de Dados](https://aulas.cubos.academy/turma/6180ea7c-53ac-4270-bd46-d772873added/aulas/bb94b971-44c5-44da-907f-1f69a5cf26c0)
 -   [Conexão NodeJs com PostgreSQL](https://aulas.cubos.academy/turma/6180ea7c-53ac-4270-bd46-d772873added/aulas/c640e794-e38b-48ab-9bbe-49fd24c640b9)
 -   [Autenticação e Criptografia](https://aulas.cubos.academy/turma/6180ea7c-53ac-4270-bd46-d772873added/aulas/14464b78-b9d4-49ca-a7ce-336c82ebed7d)
