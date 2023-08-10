@@ -28,13 +28,8 @@ const cadastrarUsuario = async (req, res) => {
             return res.status(400).json({ mensagem: "Email ja cadastrado" });
         }
 
-        const verificarEmailValido = () => {
-
-        }
-
         const senhaCriptografada = await bcrypt.hash(senha, 10);
         
-
         const queryInsert = (`
             INSERT INTO usuarios
                 (nome, email, senha)
@@ -46,14 +41,14 @@ const cadastrarUsuario = async (req, res) => {
         
         return res.status(201).json(cadastrarUsuario.rows[0]);
     } catch (error) {
-        return res.status().json({ mensagem: "Erro interno do servidor" });
+        return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }
 }
 
 const logarUsuario = async (req, res) => {
     const { email, senha } = req.body;
     if(!email || !senha){
-        return res.status().json({ mensagem: "Todos os campos são obrigatorios: nome, email e senha " });
+        return res.status(404).json({ mensagem: "Todos os campos são obrigatorios: nome, email e senha " });
     }
     
     try {
@@ -89,12 +84,26 @@ const logarUsuario = async (req, res) => {
             usuario: usuarioSemSenha, token
         });
     } catch (error) {
-        return res.status().json({ mensagem: "Erro interno do servidor" });
+        return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }
 }
 
 const obterUsuario = async (req, res) => {
-    return res.json(req.usuario);
+    const id = req.usuario;
+    // Consultar usuário no banco de dados pelo ID contido no TOKEN informado \\
+    try {
+        const queryObeterUsuario = await pool.query (`
+            SELECT *
+            FROM usuarios
+            WHERE id = $1`,
+            [id]
+        );
+    const { senha:_, ...usuarioSemSenha } = queryObeterUsuario.rows[0];
+
+    return res.status(200).json(usuarioSemSenha);
+    } catch (error) {
+        return res.status(500).json({ mensagem: "Erro interno do servidor" });
+    }
 }
 
 module.exports = {

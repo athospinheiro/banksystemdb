@@ -11,19 +11,27 @@ const verificarUsuarioLogado = async (req, res, next) => {
     const token = authorization.split(' ')[1];
 
     try {
-        const { id } = jwt.verify(token , senha_jwt);
-
+        const assinaturaToken = jwt.verify(token , senha_jwt);
+        
         const usuario = await pool.query(`
             SELECT *
             FROM usuarios
-            WHERE id = $1`, [id]
+            WHERE id = $1`, [assinaturaToken.id]
         );
 
         if(!usuario) {
             return res.status(404).json({ mensagem: "Não existe usuario" });
         }
 
-        req.usuario = usuario.rows[0];
+        /* req.usuario = usuario.rows[0]; esta retornando toda linhas de dados do usuarios */
+        // ALTERAÇÂO FEITA assinaturaToken.id; retornamos apenas o id, Ex: 1,2,3 \\
+
+        // antes req.usuario = usuario.rows[0];
+        // depois req.usuario = assinaturaToken.id;
+
+        // Consultar usuário no banco de dados pelo id contido no token informado
+        // req.usuario é o ID do TOKEN
+        req.usuario = assinaturaToken.id;
  
         next();
     } catch (error) {
