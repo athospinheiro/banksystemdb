@@ -111,8 +111,13 @@ const atualizarUsuario = async (req, res) => {
     const { nome, email, senha } = req.body;
     if (!nome || !email || !senha) {
         return res.status(400).json({ mensagem: "Todos os campos são obrigatorios: nome, email e senha " });
-
     }
+
+    const arrayEmail = email.split("");
+    if (!arrayEmail.includes("@")) {
+        return res.status(400).json({ mensagem: "Email em formato invalido" });
+    }
+
     try {
         const queryEmail = (`
             SELECT *
@@ -126,105 +131,25 @@ const atualizarUsuario = async (req, res) => {
             return res.status(400).json({ mensagem: "Email ja cadastrado" });
         }
 
-
         const senhaCriptografada = await bcrypt.hash(senha, 10);
 
-
         const queryUpdate = (`
-            UPDATE usuarios set nome = $1, email=$2, senha = $3 where id = $4
+            UPDATE usuarios
+            SET nome = $1, email= $2, senha = $3
+            WHERE id = $4
         `);
 
         const atualizarUsuario = await pool.query(queryUpdate, [nome, email, senhaCriptografada, id]);
 
-        return res.status(204).json({});;
+        return res.status(204).json();
     } catch (error) {
-        return res.status(404).json({ mensagem: "Erro interno do servidor" });
-    }
-
-}
-
-const cadastrarCategoria = async (req, res) => {
-    const { descricao } = req.body;
-    if (!descricao) {
-        return res.status(400).json({ "mensagem": "O campo descricão é obrigatório." });
-    }
-    const id = req.usuario;
-    try {
-        const queryCadastrarDescricao = (`
-        INSERT into categorias (usuario_id,descricao) values ($1,$2) returning id,descricao,usuario_id`
-        );
-
-        const cadastrarCategoria = await pool.query(queryCadastrarDescricao, [id, descricao]);
-        return res.status(201).json(cadastrarCategoria.rows[0]);
-    } catch (error) {
-        return res.status(500).json({ "mensagem": "Erro interno do servidor." });
+        return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }
 }
 
-const detalharCategoria = async (req, res) => {
-    const { id } = req.params;
-    const idAutenticado = req.usuario;
-    try {
-        const queryDetalharCategoria = (`
-        SELECT * from categorias where id = $1 and usuario_id = $2
-        `);
-        const detalharCategoria = await pool.query(queryDetalharCategoria, [id, idAutenticado]);
-        if (detalharCategoria.rowCount < 1) {
-            return res.status(404).json({ "mensagem": "categoria não existente" })
-        }
-        return res.status(200).json(detalharCategoria.rows[0]);
-
-    } catch (error) {
-        return res.status(500).json({ "mensagem": "erro interno de servidor" })
-    }
-
-
-}
-
-const listarCategorias = async (req, res) => {
-    const idAutenticado = req.usuario;
-    try {
-        const queryDetalharCategoria = (`
-        SELECT * from categorias where usuario_id = $1
-        `);
-        const listarCategoria = await pool.query(queryDetalharCategoria, [idAutenticado]);
-        return res.status(200).json(listarCategoria.rows);
-
-    } catch (error) {
-        return res.status(500).json({ "mensagem": "erro interno de servidor" })
-    }
-}
-
-const deletarCategoria = async (req, res) => {
-
-    const { id } = req.params;
-    const idAutenticado = req.usuario;
-
-    try {
-        const queryBuscarCategoria = (`
-        SELECT * from categorias where id = $1 and usuario_id = $2
-        `);
-
-        const buscarCategoria = await pool.query(queryBuscarCategoria, [id, idAutenticado]);
-        if (buscarCategoria.rowCount < 1) {
-            return res.status(404).json({ "mensagem": "categoria não encontrada." })
-        }
-
-
-        const deletarCategoria = await pool.query('delete from categorias where id = $1', [id]);
-        return res.status(204).json({});
-    } catch (error) {
-        return res.status(500).json({ "mensagem": "erro interno de servidor." })
-    }
-
-}
 module.exports = {
     cadastrarUsuario,
     logarUsuario,
     obterUsuario,
     atualizarUsuario,
-    cadastrarCategoria,
-    detalharCategoria,
-    listarCategorias,
-    deletarCategoria
 }

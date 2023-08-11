@@ -23,6 +23,9 @@ CREATE TABLE transacoes (
 	tipo TEXT NOT NULL
 );
 
+ALTER TABLE transacoes
+ALTER COLUMN data TYPE TIMESTAMP;
+
 
 
 
