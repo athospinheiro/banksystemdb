@@ -15,7 +15,7 @@ const cadastrarCategoria = async (req, res) => {
         );
 
         const cadastrarCategoria = await pool.query(queryCadastrarDescricao, [id, descricao]);
-        
+
         return res.status(204).json(cadastrarCategoria.rows[0]);
     } catch (error) {
         return res.status(500).json({ "mensagem": "Erro interno do servidor." });
@@ -51,7 +51,7 @@ const listarCategorias = async (req, res) => {
             WHERE usuario_id = $1
         `);
         const listarCategoria = await pool.query(queryDetalharCategoria, [idAutenticado]);
-        
+
         return res.status(200).json(listarCategoria.rows);
     } catch (error) {
         return res.status(500).json({ "mensagem": "erro interno de servidor" })
@@ -69,7 +69,7 @@ const deletarCategoria = async (req, res) => {
         `);
 
         const buscarCategoria = await pool.query(queryBuscarCategoria, [id, idAutenticado]);
-        
+
         if (buscarCategoria.rowCount < 1) {
             return res.status(404).json({ "mensagem": "categoria não encontrada." })
         }
@@ -99,7 +99,7 @@ const atualizarCategoriaPorID = async (req, res) => {
         `);
 
         const buscarCategoria = await pool.query(queryBuscarCategoria, [id, idAutenticado]);
-    
+
         if (buscarCategoria.rowCount < 1) {
             return res.status(404).json({ "mensagem": "categoria não encontrada." })
         }
@@ -109,9 +109,9 @@ const atualizarCategoriaPorID = async (req, res) => {
             SET descricao = $1
             WHERE id = $2
         `);
-   
+
         const atualizarCategoria = await pool.query(queryAtualizarDescricao, [descricao, id]);
-        
+
         return res.status(201).json();
     } catch (error) {
         return res.status(500).json({ "mensagem": "Erro interno do servidor." });
