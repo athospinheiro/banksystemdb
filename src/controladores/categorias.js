@@ -16,13 +16,13 @@ const cadastrarCategoria = async (req, res) => {
 
         const cadastrarCategoria = await pool.query(queryCadastrarDescricao, [id, descricao]);
 
-        return res.status(204).json(cadastrarCategoria.rows[0]);
+        return res.status(201).json(cadastrarCategoria.rows[0]);
     } catch (error) {
         return res.status(500).json({ "mensagem": "Erro interno do servidor." });
     }
 }
 
-const detalharCategoria = async (req, res) => {
+const detalharCategoriaPorId = async (req, res) => {
     const { id } = req.params;
     const idAutenticado = req.usuario;
     try {
@@ -58,7 +58,7 @@ const listarCategorias = async (req, res) => {
     }
 }
 
-const deletarCategoria = async (req, res) => {
+const deletarCategoriaPorId = async (req, res) => {
     const { id } = req.params;
     const idAutenticado = req.usuario;
     try {
@@ -82,7 +82,7 @@ const deletarCategoria = async (req, res) => {
     }
 }
 
-const atualizarCategoriaPorID = async (req, res) => {
+const atualizarCategoriaPorId = async (req, res) => {
     const { id } = req.params;
     const { descricao } = req.body;
     const idAutenticado = req.usuario;
@@ -120,8 +120,8 @@ const atualizarCategoriaPorID = async (req, res) => {
 
 module.exports = {
     cadastrarCategoria,
-    detalharCategoria,
+    detalharCategoriaPorId,
     listarCategorias,
-    deletarCategoria,
-    atualizarCategoriaPorID
+    deletarCategoriaPorId,
+    atualizarCategoriaPorId
 }

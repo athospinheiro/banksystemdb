@@ -22,7 +22,7 @@ const cadastrarTransacao = async (req, res) => {
             return res.status(404).json({ "mensagem": "categoria não existente" });
         }
 
-        const { usuario_id, descricao } = verificarCategoria.rows[0];
+        const { usuario_id, descricaoCategoria } = verificarCategoria.rows[0];
         // const { usuario_id, descricao } = verificarCategoria.rows[0];
         // console.log(descricao);
         // Descricao da categoria
@@ -31,8 +31,18 @@ const cadastrarTransacao = async (req, res) => {
             INSERT INTO transacoes
                 (descricao, valor, data, categoria_id, usuario_id, tipo)
             VALUES
-                ($1, $2, $3, $4, $5, $6) RETURNING id, tipo, descricao, valor, data, usuario_id, categoria_id
-        `);
+                ($1, $2, $3, $4, $5, $6)
+                RETURNING     
+                    id,
+                    tipo,
+                    descricao,
+                    valor,
+                    data,
+                    usuario_id,
+                    categoria_id,
+                    (SELECT descricao FROM categorias WHERE id = $4) AS categoria_nome
+            `);
+
 
         const cadastrandoTransacao = await pool.query(queryCadastrandoTransacao, [descricao, valor, data, categoria_id, usuario_id, tipo]);
 
@@ -47,27 +57,47 @@ const cadastrarTransacao = async (req, res) => {
 const listarTransacoes = async (req, res) => {
     const idAutenticado = req.usuario;
     try {
+        // const queryListarTransacoes = (`
+        //     SELECT *
+        //     FROM transacoes
+        //     WHERE usuario_id = $1
+        // `);
+        // const listarTransacoes = await pool.query(queryListarTransacoes, [idAutenticado]);
         const queryListarTransacoes = (`
-            SELECT *
-            FROM transacoes
-            WHERE usuario_id = $1
+            SELECT
+                t.id, t.tipo, t.descricao, t.valor, t.data,
+                t.usuario_id, t.categoria_id,
+                c.descricao AS categoria_nome
+            FROM transacoes t
+            JOIN categorias c
+            ON t.categoria_id = c.id
+            WHERE t.usuario_id = $1
         `);
         const listarTransacoes = await pool.query(queryListarTransacoes, [idAutenticado]);
-
         return res.status(200).json(listarTransacoes.rows);
     } catch (error) {
         return res.status(500).json({ "mensagem": "erro interno de servidor" });
     }
 }
 
-const detalharTransacao = async (req, res) => {
+const detalharTransacaoPorId = async (req, res) => {
     const { id } = req.params;
     const idAutenticado = req.usuario;
     try {
+        // const queryDetalharTransacao = (`
+        //     SELECT *
+        //     FROM transacoes
+        //     WHERE id = $1 AND usuario_id = $2
+        // `);
         const queryDetalharTransacao = (`
-            SELECT *
-            FROM transacoes
-            WHERE id = $1 AND usuario_id = $2
+            SELECT
+                t.id, t.tipo, t.descricao, t.valor, t.data,
+                t.usuario_id, t.categoria_id,
+                c.descricao AS categoria_nome
+            FROM transacoes t
+            JOIN categorias c
+            ON t.categoria_id = c.id
+            WHERE t.id = $1 AND t.usuario_id = $2
         `);
         const detalharTransacao = await pool.query(queryDetalharTransacao, [id, idAutenticado]);
         if (detalharTransacao.rowCount < 1) {
@@ -105,7 +135,7 @@ const atualizarTransacaoPorId = async (req, res) => {
 
         const buscarCategoriaPorUsuario = await pool.query('select * from categorias where id = $1 and usuario_id = $2', [categoria_id, idAutenticado]);
         if (buscarCategoriaPorUsuario.rowCount < 1) {
-            return res.status(404).json({ mensagem: "O tipo de categoria que você deseja atualizar não se encontra cadastrado para o usuário em questão." })
+            return res.status(404).json({ "mensagem": "O tipo de categoria que você deseja atualizar não se encontra cadastrado para o usuário em questão." })
         }
         const queryUpdateTransacoes = (`
             UPDATE transacoes
@@ -140,7 +170,7 @@ const deletarTransacaoPorId = async (req, res) => {
 
         const deletarTransacao = await pool.query('delete from transacoes where id = $1', [id]);
 
-        return res.status(204).json({});
+        return res.status(204).json();
     } catch (error) {
         return res.status(500).json({ mensagem: "Erro interno do servidor." });
     }
@@ -171,16 +201,20 @@ const obterExtratoTransacoes = async (req, res) => {
             saida = saida + buscarSaidas.rows[i].valor;
         }
 
-
-        return res.status(200).json({ entradas: entrada, saidas: saida });
+        return res.status(200).json(
+            {
+            entradas: entrada,
+            saidas: saida
+            }
+        );
     } catch (error) {
-        return res.status(500).json({ mensagem: "erro interno do servidor." })
+        return res.status(500).json({ mensagem: "erro interno do servidor." });
     }
 }
 module.exports = {
     cadastrarTransacao,
     listarTransacoes,
-    detalharTransacao,
+    detalharTransacaoPorId,
     atualizarTransacaoPorId,
     deletarTransacaoPorId,
     obterExtratoTransacoes
