@@ -56,13 +56,8 @@ const cadastrarTransacao = async (req, res) => {
 
 const listarTransacoes = async (req, res) => {
     const idAutenticado = req.usuario;
+    const { filtro } = req.query;
     try {
-        // const queryListarTransacoes = (`
-        //     SELECT *
-        //     FROM transacoes
-        //     WHERE usuario_id = $1
-        // `);
-        // const listarTransacoes = await pool.query(queryListarTransacoes, [idAutenticado]);
         const queryListarTransacoes = (`
             SELECT
                 t.id, t.tipo, t.descricao, t.valor, t.data,
@@ -73,8 +68,16 @@ const listarTransacoes = async (req, res) => {
             ON t.categoria_id = c.id
             WHERE t.usuario_id = $1
         `);
+
         const listarTransacoes = await pool.query(queryListarTransacoes, [idAutenticado]);
-        return res.status(200).json(listarTransacoes.rows);
+
+        if(!filtro) {
+            return res.status(200).json(listarTransacoes.rows);
+        }
+
+        const transacaoFiltrada = listarTransacoes.rows.filter((transacao) => filtro.includes(transacao.categoria_nome));
+
+        return res.status(200).json(transacaoFiltrada);
     } catch (error) {
         return res.status(500).json({ "mensagem": "erro interno de servidor" });
     }
@@ -84,11 +87,6 @@ const detalharTransacaoPorId = async (req, res) => {
     const { id } = req.params;
     const idAutenticado = req.usuario;
     try {
-        // const queryDetalharTransacao = (`
-        //     SELECT *
-        //     FROM transacoes
-        //     WHERE id = $1 AND usuario_id = $2
-        // `);
         const queryDetalharTransacao = (`
             SELECT
                 t.id, t.tipo, t.descricao, t.valor, t.data,
