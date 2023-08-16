@@ -112,7 +112,7 @@ const atualizarCategoriaPorId = async (req, res) => {
 
         const atualizarCategoria = await pool.query(queryAtualizarDescricao, [descricao, id]);
 
-        return res.status(201).json();
+        return res.status(204).send();
     } catch (error) {
         return res.status(500).json({ "mensagem": "Erro interno do servidor." });
     }
