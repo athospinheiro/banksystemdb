@@ -23,14 +23,6 @@ const verificarUsuarioLogado = async (req, res, next) => {
             return res.status(404).json({ mensagem: "Não existe usuario" });
         }
 
-        /* req.usuario = usuario.rows[0]; esta retornando toda linhas de dados do usuarios */
-        // ALTERAÇÂO FEITA assinaturaToken.id; retornamos apenas o id, Ex: 1,2,3 \\
-
-        // antes req.usuario = usuario.rows[0];
-        // depois req.usuario = assinaturaToken.id;
-
-        // Consultar usuário no banco de dados pelo id contido no token informado
-        // req.usuario é o ID do TOKEN
         req.usuario = assinaturaToken.id;
  
         next();

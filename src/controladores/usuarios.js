@@ -90,7 +90,6 @@ const logarUsuario = async (req, res) => {
 
 const obterUsuario = async (req, res) => {
     const id = req.usuario;
-    // Consultar usuário no banco de dados pelo ID contido no TOKEN informado \\
     try {
         const queryObeterUsuario = await pool.query(`
             SELECT *
@@ -141,7 +140,7 @@ const atualizarUsuario = async (req, res) => {
 
         const atualizarUsuario = await pool.query(queryUpdate, [nome, email, senhaCriptografada, id]);
 
-        return res.status(204).json();
+        return res.status(204).send();
     } catch (error) {
         return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }

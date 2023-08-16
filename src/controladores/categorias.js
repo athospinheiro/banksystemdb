@@ -54,7 +54,7 @@ const listarCategorias = async (req, res) => {
 
         return res.status(200).json(listarCategoria.rows);
     } catch (error) {
-        return res.status(500).json({ "mensagem": "erro interno de servidor" })
+        return res.status(500).json({ "mensagem": "erro interno de servidor" });
     }
 }
 
@@ -71,14 +71,14 @@ const deletarCategoriaPorId = async (req, res) => {
         const buscarCategoria = await pool.query(queryBuscarCategoria, [id, idAutenticado]);
 
         if (buscarCategoria.rowCount < 1) {
-            return res.status(404).json({ "mensagem": "categoria não encontrada." })
+            return res.status(404).json({ "mensagem": "categoria não encontrada." });
         }
 
         const deletarCategoria = await pool.query('delete from categorias where id = $1', [id]);
 
-        return res.status(204).json({});
+        return res.status(204).send();
     } catch (error) {
-        return res.status(500).json({ "mensagem": "erro interno de servidor." })
+        return res.status(500).json({ "mensagem": "erro interno de servidor." });
     }
 }
 

@@ -8,7 +8,7 @@ const cadastrarTransacao = async (req, res) => {
     }
 
     if (tipo.toLowerCase() != 'entrada' && tipo.toLowerCase() != 'saída') {
-        return res.status(400).json({ mensagem: "O tipo de transação não é válido." })
+        return res.status(400).json({ mensagem: "O tipo de transação não é válido." });
     }
     try {
         const queryVerificarCategoria = (`
@@ -23,9 +23,6 @@ const cadastrarTransacao = async (req, res) => {
         }
 
         const { usuario_id, descricaoCategoria } = verificarCategoria.rows[0];
-        // const { usuario_id, descricao } = verificarCategoria.rows[0];
-        // console.log(descricao);
-        // Descricao da categoria
 
         const queryCadastrandoTransacao = (`
             INSERT INTO transacoes
@@ -43,10 +40,7 @@ const cadastrarTransacao = async (req, res) => {
                     (SELECT descricao FROM categorias WHERE id = $4) AS categoria_nome
             `);
 
-
         const cadastrandoTransacao = await pool.query(queryCadastrandoTransacao, [descricao, valor, data, categoria_id, usuario_id, tipo]);
-
-        //const { tipo, descricao, valor, data, usuario_id, categoria_id  } = cadastrandoTransacao;
 
         return res.status(201).json(cadastrandoTransacao.rows[0]);
     } catch (error) {
@@ -109,14 +103,14 @@ const detalharTransacaoPorId = async (req, res) => {
 }
 
 const atualizarTransacaoPorId = async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
     const idAutenticado = req.usuario;
     const { descricao, valor, data, categoria_id, tipo } = req.body;
     if (!descricao || !valor || !data || !categoria_id || !tipo) {
         return res.status(400).json({ mensagem: "Todos os campos são obrigatorios: descricao, valor, data, categoria_id, tipo " });
     }
     if (tipo.toLowerCase() != 'entrada' && tipo.toLowerCase() != 'saída') {
-        return res.status(400).json({ mensagem: "O tipo de transação não é válido." })
+        return res.status(400).json({ mensagem: "O tipo de transação não é válido." });
     }
     try {
         const queryProcurarTransacaoPorId = (`
@@ -143,7 +137,7 @@ const atualizarTransacaoPorId = async (req, res) => {
 
         const atualizarTransacaoPorId = await pool.query(queryUpdateTransacoes, [descricao, valor, data, categoria_id, tipo, id]);
 
-        return res.status(204).json();
+        return res.status(204).send();
     } catch (error) {
         return res.status(500).json({ mensagem: "Erro interno do servidor" });
     }
@@ -168,7 +162,7 @@ const deletarTransacaoPorId = async (req, res) => {
 
         const deletarTransacao = await pool.query('delete from transacoes where id = $1', [id]);
 
-        return res.status(204).json();
+        return res.status(204).send();
     } catch (error) {
         return res.status(500).json({ mensagem: "Erro interno do servidor." });
     }
@@ -176,7 +170,6 @@ const deletarTransacaoPorId = async (req, res) => {
 
 const obterExtratoTransacoes = async (req, res) => {
     const idAutenticado = req.usuario;
-
     try {
         let entrada = 0;
         let saida = 0;
@@ -206,7 +199,7 @@ const obterExtratoTransacoes = async (req, res) => {
             }
         );
     } catch (error) {
-        return res.status(500).json({ mensagem: "erro interno do servidor." });
+        return res.status(500).json({ "mensagem": "erro interno do servidor." });
     }
 }
 module.exports = {

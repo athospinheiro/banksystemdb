@@ -8,5 +8,4 @@ const pool = new Pool({
 	database: 'dindin',
 });
 
-
 module.exports = pool;
